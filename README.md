@@ -1804,6 +1804,1218 @@ var search = function(nums, target) {
 }
 ```
 
+# [34\. 在排序数组中查找元素的第一个和最后一个位置](https://leetcode.cn/problems/find-first-and-last-position-of-element-in-sorted-array/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [二分查找](https://leetcode.cn/tag/binary-search/)
+
+
+给你一个按照非递减顺序排列的整数数组 `nums`，和一个目标值 `target`。请你找出给定目标值在数组中的开始位置和结束位置。
+
+如果数组中不存在目标值 `target`，返回 `[-1, -1]`。
+
+你必须设计并实现时间复杂度为 `O(log n)` 的算法解决此问题。
+
+**示例 1：**
+
+```
+输入：nums = [5,7,7,8,8,10], target = 8
+输出：[3,4]
+```
+
+**示例 2：**
+
+```
+输入：nums = [5,7,7,8,8,10], target = 6
+输出：[-1,-1]
+```
+
+**示例 3：**
+
+```
+输入：nums = [], target = 0
+输出：[-1,-1]
+```
+
+**提示：**
+
+*   0 <= nums.length <= 10<sup>5</sup>
+*   -10<sup>9</sup> <= nums[i] <= 10<sup>9</sup>
+*   `nums` 是一个非递减数组
+*   -10<sup>9</sup> <= target <= 10<sup>9</sup>
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number[]}
+ */
+var searchRange = function(nums, target) {
+    let [start, end] = [0, nums.length - 1]
+    while(start <= end) {
+        const mid = (start + end) >>> 1
+        if (nums[mid] === target) {
+            [start, end] = [mid, mid]
+            break
+        }
+        nums[mid] > target ? (end = mid - 1) : (start = mid + 1)
+    }
+    while (nums[start - 1] === target) start--
+    while (nums[end + 1] === target) end++
+    return start > end ? [-1, -1] : [start, end]
+}
+```
+
+# [39\. 组合总和](https://leetcode.cn/problems/combination-sum/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [回溯](https://leetcode.cn/tag/backtracking/)
+
+
+给你一个 **无重复元素** 的整数数组 `candidates` 和一个目标整数 `target` ，找出 `candidates` 中可以使数字和为目标数 `target` 的 _所有 _**不同组合** ，并以列表形式返回。你可以按 **任意顺序** 返回这些组合。
+
+`candidates` 中的 **同一个** 数字可以 **无限制重复被选取** 。如果至少一个数字的被选数量不同，则两种组合是不同的。 
+
+对于给定的输入，保证和为 `target` 的不同组合数少于 `150` 个。
+
+**示例 1：**
+
+```
+输入：candidates = [2,3,6,7], target = 7
+输出：[[2,2,3],[7]]
+解释：
+2 和 3 可以形成一组候选，2 + 2 + 3 = 7 。注意 2 可以使用多次。
+7 也是一个候选， 7 = 7 。
+仅有这两种组合。
+```
+
+**示例 2：**
+
+```
+输入: candidates = [2,3,5], target = 8
+输出: [[2,2,2,2],[2,3,3],[3,5]]
+```
+
+**示例 3：**
+
+```
+输入: candidates = [2], target = 1
+输出: []
+```
+
+**提示：**
+
+*   `1 <= candidates.length <= 30`
+*   `1 <= candidates[i] <= 200`
+*   `candidate` 中的每个元素都 **互不相同**
+*   `1 <= target <= 500`
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} candidates
+ * @param {number} target
+ * @return {number[][]}
+ */
+// 搜索回溯
+var combinationSum = function(candidates, target) {
+    const ans = []
+    const dfs = (target, item, idx) => {
+        if (idx === candidates.length) return
+        if (target === 0) {
+            ans.push(item)
+            return
+        }
+        dfs(target, item, idex + 1)
+        if (target - candidates[idx] >= 0) {
+            dfs(target - candidates[idx], [...item, candidates[idx]], idx)
+        }
+    }
+    dfs(target, [], 0)
+    return ans
+}
+```
+
+# [42\. 接雨水](https://leetcode.cn/problems/trapping-rain-water/)
+
+## Description
+
+Difficulty: **困难**  
+
+Related Topics: [栈](https://leetcode.cn/tag/stack/), [数组](https://leetcode.cn/tag/array/), [双指针](https://leetcode.cn/tag/two-pointers/), [动态规划](https://leetcode.cn/tag/dynamic-programming/), [单调栈](https://leetcode.cn/tag/monotonic-stack/)
+
+
+给定 `n` 个非负整数表示每个宽度为 `1` 的柱子的高度图，计算按此排列的柱子，下雨之后能接多少雨水。
+
+**示例 1：**
+
+![](https://assets.leetcode-cn.com/aliyun-lc-upload/uploads/2018/10/22/rainwatertrap.png)
+
+```
+输入：height = [0,1,0,2,1,0,1,3,2,1,2,1]
+输出：6
+解释：上面是由数组 [0,1,0,2,1,0,1,3,2,1,2,1] 表示的高度图，在这种情况下，可以接 6 个单位的雨水（蓝色部分表示雨水）。 
+```
+
+**示例 2：**
+
+```
+输入：height = [4,2,0,3,2,5]
+输出：9
+```
+
+**提示：**
+
+*   `n == height.length`
+*   1 <= n <= 2 * 10<sup>4</sup>
+*   0 <= height[i] <= 10<sup>5</sup>
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} height
+ * @return {number}
+ */
+// 动态规划
+var trap = function(height) {
+    const n = height.length
+    const left = new Array(n).fill(0)
+    const right = new Array(n).fill(0)
+    let ans = 0
+    for (let i = 1; i < n; i++) {
+        left[i] = Math.max(left[i-1], height[i-1])
+    }
+    for (let i = n - 2; i >= 0; i--) {
+        right[i] = Math.max(right[i+1], height[i+1])
+        let short = Math.min(left[i], right[i]
+        if (short > height[i]) {
+            ans += short - height[i]
+        }
+     }
+     return ans
+}
+
+```
+
+# [46\. 全排列](https://leetcode.cn/problems/permutations/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [回溯](https://leetcode.cn/tag/backtracking/)
+
+
+给定一个不含重复数字的数组 `nums` ，返回其 _所有可能的全排列_ 。你可以 **按任意顺序** 返回答案。
+
+**示例 1：**
+
+```
+输入：nums = [1,2,3]
+输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [0,1]
+输出：[[0,1],[1,0]]
+```
+
+**示例 3：**
+
+```
+输入：nums = [1]
+输出：[[1]]
+```
+
+**提示：**
+
+*   `1 <= nums.length <= 6`
+*   `-10 <= nums[i] <= 10`
+*   `nums` 中的所有整数 **互不相同**
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number[][]}
+ * 广度优先遍历
+ * 深度优先遍历
+ */
+var permute = function(nums) {
+    const ans = []
+    const dfs = (item = []) => {
+        if (item.length === nums.length) return ans.push([...item])
+        
+        nums.forEach(num => {
+            if (!item.includes(num)) {
+                dfs([...item, num]
+            }
+        })
+    }
+    dfs()
+    return ans
+}
+```
+
+# [48\. 旋转图像](https://leetcode.cn/problems/rotate-image/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [数学](https://leetcode.cn/tag/math/), [矩阵](https://leetcode.cn/tag/matrix/)
+
+
+给定一个 _n _× _n_ 的二维矩阵 `matrix` 表示一个图像。请你将图像顺时针旋转 90 度。
+
+你必须在 旋转图像，这意味着你需要直接修改输入的二维矩阵。**请不要** 使用另一个矩阵来旋转图像。
+
+**示例 1：**
+
+![](https://assets.leetcode.com/uploads/2020/08/28/mat1.jpg)
+
+```
+输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+输出：[[7,4,1],[8,5,2],[9,6,3]]
+```
+
+**示例 2：**
+
+![](https://assets.leetcode.com/uploads/2020/08/28/mat2.jpg)
+
+```
+输入：matrix = [[5,1,9,11],[2,4,8,10],[13,3,6,7],[15,14,12,16]]
+输出：[[15,13,2,5],[14,3,4,1],[12,6,8,9],[16,7,10,11]]
+```
+
+**提示：**
+
+*   `n == matrix.length == matrix[i].length`
+*   `1 <= n <= 20`
+*   `-1000 <= matrix[i][j] <= 1000`
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[][]} matrix
+ * @return {void} Do not return anything, modify matrix in-place instead.
+ */
+// 使用辅助数组
+// 对于矩阵中第 i 行的第 j 个元素，在旋转后，它出现在倒数第 i 列的第 j 个位置。
+// matrix[row][col] matrix_new[col][n-row-1]
+var rotate = function(matrix) {
+    const n = matrix.length
+    const matrix_new = new Array(n).fill(0).map(() => new Array(n).fill(0))
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            matrix_new[j][n-1-i] = matrix[i][j]
+        }
+    }
+    for (let i = 0; i < n; i++) {
+        for (let j = 0; j < n; j++) {
+            matrix[i][j] = matrix_new[i][j]
+        }
+    }
+}
+```
+
+# [49\. 字母异位词分组](https://leetcode.cn/problems/group-anagrams/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [哈希表](https://leetcode.cn/tag/hash-table/), [字符串](https://leetcode.cn/tag/string/), [排序](https://leetcode.cn/tag/sorting/)
+
+
+给你一个字符串数组，请你将 **字母异位词** 组合在一起。可以按任意顺序返回结果列表。
+
+**字母异位词** 是由重新排列源单词的字母得到的一个新单词，所有源单词中的字母通常恰好只用一次。
+
+**示例 1:**
+
+```
+输入: strs = ["eat", "tea", "tan", "ate", "nat", "bat"]
+输出: [["bat"],["nat","tan"],["ate","eat","tea"]]
+```
+
+**示例 2:**
+
+```
+输入: strs = [""]
+输出: [[""]]
+```
+
+**示例 3:**
+
+```
+输入: strs = ["a"]
+输出: [["a"]]
+```
+
+**提示：**
+
+*   1 <= strs.length <= 10<sup>4</sup>
+*   `0 <= strs[i].length <= 100`
+*   `strs[i]` 仅包含小写字母
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {string[]} strs
+ * @return {string[][]}
+ */
+var groupAnagrams = function(strs) {
+    const map = new Map()
+    for (let str of strs) {
+        let array = Array.from(str)
+        array.sort()
+        
+        let key = array.toString()
+        let list = map.get(key) ? map.get(key) : []
+        list.push(str)
+        
+        map.set(key, list)
+    }
+    return Array.from(map.values())
+};
+```
+
+# [53\. 最大子数组和](https://leetcode.cn/problems/maximum-subarray/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [分治](https://leetcode.cn/tag/divide-and-conquer/), [动态规划](https://leetcode.cn/tag/dynamic-programming/)
+
+
+给你一个整数数组 `nums` ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+
+**子数组** 是数组中的一个连续部分。
+
+**示例 1：**
+
+```
+输入：nums = [-2,1,-3,4,-1,2,1,-5,4]
+输出：6
+解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
+```
+
+**示例 2：**
+
+```
+输入：nums = [1]
+输出：1
+```
+
+**示例 3：**
+
+```
+输入：nums = [5,4,-1,7,8]
+输出：23
+```
+
+**提示：**
+
+*   1 <= nums.length <= 10<sup>5</sup>
+*   -10<sup>4</sup> <= nums[i] <= 10<sup>4</sup>
+
+**进阶：**如果你已经实现复杂度为 `O(n)` 的解法，尝试使用更为精妙的 **分治法** 求解。
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number}
+ */
+// 动态规划
+var maxSubArray = function(nums) {
+    let pre = 0
+    let maxAns = nums[0]
+    nums.forEach((x) => {
+        pre = Math.max(pre + x, x)
+        maxAns = Math.max(maxAns, pre)
+    })
+    return maxAns
+}
+```
+
+# [55\. 跳跃游戏](https://leetcode.cn/problems/jump-game/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [贪心](https://leetcode.cn/tag/greedy/), [数组](https://leetcode.cn/tag/array/), [动态规划](https://leetcode.cn/tag/dynamic-programming/)
+
+
+给定一个非负整数数组 `nums` ，你最初位于数组的 **第一个下标** 。
+
+数组中的每个元素代表你在该位置可以跳跃的最大长度。
+
+判断你是否能够到达最后一个下标。
+
+**示例 1：**
+
+```
+输入：nums = [2,3,1,1,4]
+输出：true
+解释：可以先跳 1 步，从下标 0 到达下标 1, 然后再从下标 1 跳 3 步到达最后一个下标。
+```
+
+**示例 2：**
+
+```
+输入：nums = [3,2,1,0,4]
+输出：false
+解释：无论怎样，总会到达下标为 3 的位置。但该下标的最大跳跃长度是 0 ， 所以永远不可能到达最后一个下标。
+```
+
+**提示：**
+
+*   1 <= nums.length <= 3 * 10<sup>4</sup>
+*   0 <= nums[i] <= 10<sup>5</sup>
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {boolean}
+ */
+// 贪心
+// var canJump = function(nums) {
+//     // 如果只有一个，返回true
+//     if (nums.length === 1) return true
+//     // 记录所能到达的最大位置
+//     var res = nums[0]
+//     for (let i = 1; i < nums.length; i++) {
+//         // 如果最大位置不能到达当前位置，则跳出
+//         if (res < i) break
+//         // 如果最大位置超过最后一个位置，则返回true
+//         if (res >= nums.length - 1) return true
+//         // 计算能到达的最大位置
+//         res = res > nums[i] + i ? res : nums[i] + i
+//     }
+//     return false
+// }
+
+// 贪心
+var canJump = function(nums) {
+    let n = nums.length - 1
+    let maxLen = 0
+    for (let i = 0; i <= maxLen; i++) {
+        maxLen = Math.max(maxLen, nums[i] + i)
+        if (maxLen >= n) return true
+    }
+    return false
+}
+
+// 动态规划
+// var canJump = function(nums) {
+//     let end = nums.length - 1
+
+//     for (let i = nums.length - 2; i >= 0; i--) {
+//         if (end - i <= nums[i]) {
+//             end = i
+//         }
+//     }
+
+//     return end === 0
+// }
+
+```
+
+# [56\. 合并区间](https://leetcode.cn/problems/merge-intervals/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [排序](https://leetcode.cn/tag/sorting/)
+
+
+以数组 `intervals` 表示若干个区间的集合，其中单个区间为 intervals[i] = [start<sub>i</sub>, end<sub>i</sub>] 。请你合并所有重叠的区间，并返回 _一个不重叠的区间数组，该数组需恰好覆盖输入中的所有区间_ 。
+
+**示例 1：**
+
+```
+输入：intervals = [[1,3],[2,6],[8,10],[15,18]]
+输出：[[1,6],[8,10],[15,18]]
+解释：区间 [1,3] 和 [2,6] 重叠, 将它们合并为 [1,6].
+```
+
+**示例 2：**
+
+```
+输入：intervals = [[1,4],[4,5]]
+输出：[[1,5]]
+解释：区间 [1,4] 和 [4,5] 可被视为重叠区间。
+```
+
+**提示：**
+
+*   1 <= intervals.length <= 10<sup>4</sup>
+*   `intervals[i].length == 2`
+*   0 <= start<sub>i</sub> <= end<sub>i</sub> <= 10<sup>4</sup>
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[][]} intervals
+ * @return {number[][]}
+ */
+
+var merge = function (intervals) {
+    let res = []
+    intervals.sort((a, b) => a[0] - b[0])
+    let prev = intervals[0]
+    for (let i = 1; i < intervals.length; i++) {
+        let cur = intervals[i]
+        if (prev[1] >= cur[0]) {
+            prev[1] = Math.max(prev[1], cur[1])
+        } else {
+            res.push(prev)
+            prev = cur
+        }
+    }
+    res.push(prev)
+    return res
+}
+
+```
+
+# [62\. 不同路径](https://leetcode.cn/problems/unique-paths/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数学](https://leetcode.cn/tag/math/), [动态规划](https://leetcode.cn/tag/dynamic-programming/), [组合数学](https://leetcode.cn/tag/combinatorics/)
+
+
+一个机器人位于一个 `m x n`网格的左上角 （起始点在下图中标记为 “Start” ）。
+
+机器人每次只能向下或者向右移动一步。机器人试图达到网格的右下角（在下图中标记为 “Finish” ）。
+
+问总共有多少条不同的路径？
+
+**示例 1：**
+
+![](https://assets.leetcode.com/uploads/2018/10/22/robot_maze.png)
+
+```
+输入：m = 3, n = 7
+输出：28
+```
+
+**示例 2：**
+
+```
+输入：m = 3, n = 2
+输出：3
+解释：
+从左上角开始，总共有 3 条路径可以到达右下角。
+1\. 向右 -> 向下 -> 向下
+2\. 向下 -> 向下 -> 向右
+3\. 向下 -> 向右 -> 向下
+```
+
+**示例 3：**
+
+```
+输入：m = 7, n = 3
+输出：28
+```
+
+**示例 4：**
+
+```
+输入：m = 3, n = 3
+输出：6
+```
+
+**提示：**
+
+*   `1 <= m, n <= 100`
+*   题目数据保证答案小于等于 2 * 10<sup>9</sup>
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number} m
+ * @param {number} n
+ * @return {number}
+ * 动态规划 每一格的路径由其上一格和左一格决定。
+ * 动态方程：dp[i][j] = dp[i-1][j] + dp[i][j-1]
+ * 注意：对于第一行 dp[0][j]，或者第一列 dp[i][0]，由于都是在边界，所以只能为1
+ * 建立m*n的矩阵，注意第0行和第0列元素均为1
+ */
+var uniquePaths = function(m, n) {
+    const dp = new Array(m).fill(0).map(() => new Array(n).fill(0))
+    
+    for (let i = 0; i < m; i++) {
+        dp[i][0] = 1
+    }
+    for (let j = 0; j < n; j++) {
+        dp[0][j] = 1
+    }
+    
+    for (let i = 1; i < m; i++) {
+        for (let j = 1; j < n; j++) {
+            dp[i][j] = dp[i-1][j] + dp[i][j-1]
+        }
+    }
+    return dp[m-1][n-1]
+}
+
+```
+
+# [64\. 最小路径和](https://leetcode.cn/problems/minimum-path-sum/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [动态规划](https://leetcode.cn/tag/dynamic-programming/), [矩阵](https://leetcode.cn/tag/matrix/)
+
+
+给定一个包含非负整数的 `_m_ x _n_` 网格 `grid` ，请找出一条从左上角到右下角的路径，使得路径上的数字总和为最小。
+
+**说明：**每次只能向下或者向右移动一步。
+
+**示例 1：**
+
+![](https://assets.leetcode.com/uploads/2020/11/05/minpath.jpg)
+
+```
+输入：grid = [[1,3,1],[1,5,1],[4,2,1]]
+输出：7
+解释：因为路径 1→3→1→1→1 的总和最小。
+```
+
+**示例 2：**
+
+```
+输入：grid = [[1,2,3],[4,5,6]]
+输出：12
+```
+
+**提示：**
+
+*   `m == grid.length`
+*   `n == grid[i].length`
+*   `1 <= m, n <= 200`
+*   `0 <= grid[i][j] <= 100`
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[][]} grid
+ * @return {number}
+ */
+var minPathSum = function(grid) {
+    if (grid === null || grid.length === 0 || grid[0].length === 0) {
+        return 0
+    }
+    let row = grid.length, col = grid[0].length
+    const dp = new Array(row).fill(0).map(() => new Array(col).fill(0))
+    dp[0][0] = grid[0][0]
+    for (let i = 1; i < row; i++) {
+        dp[i][0] = dp[i-1][0] + grid[i][0]
+    }
+    for (let j = 1; j < col; j++) {
+        dp[0][j] = dp[0][j-1] + grid[0][j]
+    }
+    for (let i = 1; i < row; i++) {
+        for (let j = 1; j < col; j++) {
+            dp[i][j] = Math.min(dp[i][j-1], dp[i-1][j]) + grid[i][j]
+        }
+    }
+    return dp[row-1][col-1]
+}
+
+```
+
+# [70\. 爬楼梯](https://leetcode.cn/problems/climbing-stairs/)
+
+## Description
+
+Difficulty: **简单**  
+
+Related Topics: [记忆化搜索](https://leetcode.cn/tag/memoization/), [数学](https://leetcode.cn/tag/math/), [动态规划](https://leetcode.cn/tag/dynamic-programming/)
+
+
+假设你正在爬楼梯。需要 `n` 阶你才能到达楼顶。
+
+每次你可以爬 `1` 或 `2` 个台阶。你有多少种不同的方法可以爬到楼顶呢？
+
+**示例 1：**
+
+```
+输入：n = 2
+输出：2
+解释：有两种方法可以爬到楼顶。
+1\. 1 阶 + 1 阶
+2\. 2 阶
+```
+
+**示例 2：**
+
+```
+输入：n = 3
+输出：3
+解释：有三种方法可以爬到楼顶。
+1\. 1 阶 + 1 阶 + 1 阶
+2\. 1 阶 + 2 阶
+3\. 2 阶 + 1 阶
+```
+
+**提示：**
+
+*   `1 <= n <= 45`
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number} n
+ * @return {number}
+ * 题目分析:
+ * 第1级台阶：1种方法（爬1级）
+ * 第2级台阶：2种方法（爬1级或爬2级）
+ * 第n级台阶：dp[i] = dp[i-1] + dp[i-2]
+ */
+// 动态规划
+// 滚动数组思想
+// var climbStairs = function(n) {
+//     if (n === 1) return 1
+//     if (n === 2) return 2
+//     let [pre, cur, sum] = [1, 1, 2]
+//     for (let i = 3; i <= n; i++) {
+//         [pre, cur] = [cur, sum]
+//         sum = pre + cur
+//     }
+//     return sum
+// }
+
+var climbStairs = function(n) {
+    const dp = []
+    dp[0] = 1
+    dp[1] = 1
+    for (let i = 2; i <= n; i++) {
+        dp[i] = dp[i-1] + dp[i-2]
+    }
+    return dp[n]
+}
+
+```
+
+# [72\. 编辑距离](https://leetcode.cn/problems/edit-distance/)
+
+## Description
+
+Difficulty: **困难**  
+
+Related Topics: [字符串](https://leetcode.cn/tag/string/), [动态规划](https://leetcode.cn/tag/dynamic-programming/)
+
+
+给你两个单词 `word1` 和 `word2`， _请返回将 `word1` 转换成 `word2` 所使用的最少操作数_  。
+
+你可以对一个单词进行如下三种操作：
+
+*   插入一个字符
+*   删除一个字符
+*   替换一个字符
+
+**示例 1：**
+
+```
+输入：word1 = "horse", word2 = "ros"
+输出：3
+解释：
+horse -> rorse (将 'h' 替换为 'r')
+rorse -> rose (删除 'r')
+rose -> ros (删除 'e')
+```
+
+**示例 2：**
+
+```
+输入：word1 = "intention", word2 = "execution"
+输出：5
+解释：
+intention -> inention (删除 't')
+inention -> enention (将 'i' 替换为 'e')
+enention -> exention (将 'n' 替换为 'x')
+exention -> exection (将 'n' 替换为 'c')
+exection -> execution (插入 'u')
+```
+
+**提示：**
+
+*   `0 <= word1.length, word2.length <= 500`
+*   `word1` 和 `word2` 由小写英文字母组成
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {string} word1
+ * @param {string} word2
+ * @return {number}
+ */
+// dp[i][j]是word1,word2的最小编辑距离
+var minDistance = function(word1, word2) {
+    let m = word1.length
+    let n = word2.length
+    const dp = new Array(m+1).fill(0).map(() => new Array(n+1).fill(0))
+    // 初始化
+    for (let i = 1; i <= m; i++) {
+        dp[i][0] = i
+    }
+    for (let j = 1; j <= n; j++) {
+        dp[0][j] = j
+    }
+    for (let i = 1; i <= m; i++) {
+        for (let j = 1; j <= n; j++) {
+            if (word1[i-1] === word2[j-1]) {
+                dp[i][j] = dp[i-1][j-1]
+            } else {
+                dp[i][j] = Math.min(dp[i-1][j], dp[i][j-1], dp[i-1][j-1]) + 1
+            }
+         }
+     }
+     return dp[m][n]
+}
+
+```
+
+# [75\. 颜色分类](https://leetcode.cn/problems/sort-colors/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [双指针](https://leetcode.cn/tag/two-pointers/), [排序](https://leetcode.cn/tag/sorting/)
+
+
+给定一个包含红色、白色和蓝色、共 `n`个元素的数组 `nums` ，对它们进行排序，使得相同颜色的元素相邻，并按照红色、白色、蓝色顺序排列。
+
+我们使用整数 `0`、 `1` 和 `2` 分别表示红色、白色和蓝色。
+
+必须在不使用库的sort函数的情况下解决这个问题。
+
+**示例 1：**
+
+```
+输入：nums = [2,0,2,1,1,0]
+输出：[0,0,1,1,2,2]
+```
+
+**示例 2：**
+
+```
+输入：nums = [2,0,1]
+输出：[0,1,2]
+```
+
+**提示：**
+
+*   `n == nums.length`
+*   `1 <= n <= 300`
+*   `nums[i]` 为 `0`、`1` 或 `2`
+
+**进阶：**
+
+*   你可以不使用代码库中的排序函数来解决这道题吗？
+*   你能想出一个仅使用常数空间的一趟扫描算法吗？
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {void}
+ * 
+ */
+// 遇到0，把0放在数组最前方，此时i位置没变，不用处理
+// 遇到2，把2放在数组最后放，此时i向后偏移了1，需要进行i--，然后数组末尾的2已经被统计过了，所以len可以对应再减1，避免重复的问题
+
+var sortColors = function(nums) {
+    let len = nums.length
+    for (let i = 0; i < len; i++) {
+        if (nums[i] === 0) {
+            nums.splice(i, 1)
+            nums.unshift(0)
+        } else if (nums[i] === 2) {
+            nums.splice(i, 1)
+            nums.push(2)
+            len--
+            i--
+        }
+    }
+}
+
+```
+
+# [76\. 最小覆盖子串](https://leetcode.cn/problems/minimum-window-substring/)
+
+## Description
+
+Difficulty: **困难**  
+
+Related Topics: [哈希表](https://leetcode.cn/tag/hash-table/), [字符串](https://leetcode.cn/tag/string/), [滑动窗口](https://leetcode.cn/tag/sliding-window/)
+
+
+给你一个字符串 `s` 、一个字符串 `t` 。返回 `s` 中涵盖 `t` 所有字符的最小子串。如果 `s` 中不存在涵盖 `t` 所有字符的子串，则返回空字符串 `""` 。
+
+**注意：**
+
+*   对于 `t` 中重复字符，我们寻找的子字符串中该字符数量必须不少于 `t` 中该字符数量。
+*   如果 `s` 中存在这样的子串，我们保证它是唯一的答案。
+
+**示例 1：**
+
+```
+输入：s = "ADOBECODEBANC", t = "ABC"
+输出："BANC"
+```
+
+**示例 2：**
+
+```
+输入：s = "a", t = "a"
+输出："a"
+```
+
+**示例 3:**
+
+```
+输入: s = "a", t = "aa"
+输出: ""
+解释: t 中两个字符 'a' 均应包含在 s 的子串中，
+因此没有符合条件的子字符串，返回空字符串。
+```
+
+**提示：**
+
+*   1 <= s.length, t.length <= 10<sup>5</sup>
+*   `s` 和 `t` 由英文字母组成
+
+**进阶：**你能设计一个在 `o(n)` 时间内解决此问题的算法吗？
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {string} s
+ * @param {string} t
+ * @return {string}
+ */
+// 将需要匹配的字符放入字典表，存储结构为需要匹配的字符，以及字符出现的次数：[字符，次数]
+// 利用双指针维护一个滑动窗口，不断移动右指针
+// 判断右指针的字符是否与字典表中的匹配
+// 是：将字典表中的次数-1，直到为0（创建一个needType）记录需要匹配的字符数量，初始长度为Map的size，当对应的字符次数为0时，就减1
+// 否：继续移动右指针
+// 当needType的值为0时，就证明在当前窗口所有字符都匹配成功了
+// 1.移动左指针，缩小滑动窗口的大小
+// 2.移动过程中判断左指针指向的值是否为字典中值，如果是就证明匹配的值少了一个，这个需要更新Map中的次数，以及needType的数量
+// 3.记录每次窗口中的字符，找到最小的返回
+var minWindow = function(s, t) {
+    // 创建左指针
+    let l = 0
+    // 创建右指针
+    let r = 0
+    // 最后需要返回的最小长度子串
+    let res = ''
+    // 创建字典表
+    const m = new Map()
+    // 遍历需要匹配的字符
+    for (let i = 0; i < t.length; i++) {
+        const c = t[i]
+        // 放入字典表
+        m.set(c, m.has(c) ? m.get(c) + 1 : 1)
+    }
+    // 创建记录需要匹配的字符种类
+    let needType = m.size
+    // 遍历字符串
+    while (r < s.length) {
+        // 获取当前字符
+        const c = s[r]
+        // 如果是需要匹配的字符
+        if (m.has(c)) {
+            // 更新字典表中的次数-1
+            m.set(c, m.get(c) - 1)
+            // 如果次数为0， 证明这个字符种类在当前窗口已经集起了, needType-1
+            if (m.get(c) === 0) needType -= 1
+        }
+        // 当needType为0，证明所有需要匹配的字符串都已经在当前滑动窗口中
+        while (needType === 0) {
+            const c2 = s[l]
+            // 记录当前滑动窗口的字符
+            let numRes = s.slice(l, r + 1)
+            // 当新的窗口中字符长度小于上次的字符长度时，更新结果
+            // !res 是在结构值为空的时候需要更新一下第一次匹配的值
+            if (!res || newRes.length < res.length) res = newRes
+            // 如果左指针移动过程中出现，字典中的值证明需要匹配的字符已经脱离了当前窗口
+            if (m.has(c2)) {
+                // 更新表中需要出现的次数
+                m.set(c2, m.get(c2) + 1)
+                // 更新needType
+                if (m.get(c2) === 1) needType += 1
+            }
+            // 移动左指针
+            l++
+        }
+        // 移动右指针
+        r++
+    }
+    // 返回结果值
+    return res
+}
+```
+
+# [78\. 子集](https://leetcode.cn/problems/subsets/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [位运算](https://leetcode.cn/tag/bit-manipulation/), [数组](https://leetcode.cn/tag/array/), [回溯](https://leetcode.cn/tag/backtracking/)
+
+
+给你一个整数数组 `nums` ，数组中的元素 **互不相同** 。返回该数组所有可能的子集（幂集）。
+
+解集 **不能** 包含重复的子集。你可以按 **任意顺序** 返回解集。
+
+**示例 1：**
+
+```
+输入：nums = [1,2,3]
+输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+```
+
+**示例 2：**
+
+```
+输入：nums = [0]
+输出：[[],[0]]
+```
+
+**提示：**
+
+*   `1 <= nums.length <= 10`
+*   `-10 <= nums[i] <= 10`
+*   `nums` 中的所有元素 **互不相同**
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {number[][]}
+ */
+// 递归法实现子集枚举
+// var subsets = function (nums) {
+//     let result = []
+//     let path = []
+//     function backtracking(startIndex) {
+//         result.push(path.slice())
+//         for (let i = startIndex; i < nums.length; i++) {
+//             path.push(nums[i])
+//             backtracking(i + 1)
+//             path.pop()
+//         }
+//     }
+//     backtracking(0)
+//     return result
+// }
+
+// DFS回溯思路
+var subsets = function (nums) {
+    const res = []
+    const dfs = (index, list) => {
+        res.push(list.slice())
+        for (let i = index; i < nums.length; i++) {
+            list.push(num[i])
+            dfs(i+1, list)
+            list.pop()
+        }
+    }
+    dfs(0, [])
+    return res
+}
+
+```
+
 
 
 
