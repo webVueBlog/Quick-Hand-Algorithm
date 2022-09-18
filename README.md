@@ -1560,6 +1560,251 @@ var strStr = function(haystack, needle) {
 };
 ```
 
+# [31\. 下一个排列](https://leetcode.cn/problems/next-permutation/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [双指针](https://leetcode.cn/tag/two-pointers/)
+
+
+整数数组的一个 **排列**  就是将其所有成员以序列或线性顺序排列。
+
+*   例如，`arr = [1,2,3]` ，以下这些都可以视作 `arr` 的排列：`[1,2,3]`、`[1,3,2]`、`[3,1,2]`、`[2,3,1]` 。
+
+整数数组的 **下一个排列** 是指其整数的下一个字典序更大的排列。更正式地，如果数组的所有排列根据其字典顺序从小到大排列在一个容器中，那么数组的 **下一个排列** 就是在这个有序容器中排在它后面的那个排列。如果不存在下一个更大的排列，那么这个数组必须重排为字典序最小的排列（即，其元素按升序排列）。
+
+*   例如，`arr = [1,2,3]` 的下一个排列是 `[1,3,2]` 。
+*   类似地，`arr = [2,3,1]` 的下一个排列是 `[3,1,2]` 。
+*   而 `arr = [3,2,1]` 的下一个排列是 `[1,2,3]` ，因为 `[3,2,1]` 不存在一个字典序更大的排列。
+
+给你一个整数数组 `nums` ，找出 `nums` 的下一个排列。
+
+必须修改，只允许使用额外常数空间。
+
+**示例 1：**
+
+```
+输入：nums = [1,2,3]
+输出：[1,3,2]
+```
+
+**示例 2：**
+
+```
+输入：nums = [3,2,1]
+输出：[1,2,3]
+```
+
+**示例 3：**
+
+```
+输入：nums = [1,1,5]
+输出：[1,5,1]
+```
+
+**提示：**
+
+*   `1 <= nums.length <= 100`
+*   `0 <= nums[i] <= 100`
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @return {void} Do not return anything, modify nums in-place instead.
+ */
+// a[i-1] a[j]
+var nextPermutation = function(nums) {
+    const len = nums.length
+    let i = len - 2
+    // 找到第一个当前项比后一项小的位置
+    while(i >= 0 && nums[i] >= nums[i+1]) i--
+    // i>=0，说明此时不是最大的排序
+    if (i >= 0) {
+        let j = len - 1
+        // 找到最小的比nums[i]大的数对应的j
+        while(j > 1 && nums[i] >= nums[j]) j--
+        // 交换位置
+        [nums[i], nums[j]] = [nums[j], nums[i]]
+    }
+    // i后面的数升序排序
+    let [left, right = [i + 1, len - 1]
+    while (left < right) {
+        [nums[left], nums[right]] = [nums[right], nums[left]]
+        left++
+        right--
+    }
+}
+```
+
+# [32\. 最长有效括号](https://leetcode.cn/problems/longest-valid-parentheses/)
+
+## Description
+
+Difficulty: **困难**  
+
+Related Topics: [栈](https://leetcode.cn/tag/stack/), [字符串](https://leetcode.cn/tag/string/), [动态规划](https://leetcode.cn/tag/dynamic-programming/)
+
+
+给你一个只包含 `'('` 和 `')'` 的字符串，找出最长有效（格式正确且连续）括号子串的长度。
+
+
+**示例 1：**
+
+```
+输入：s = "(()"
+输出：2
+解释：最长有效括号子串是 "()"
+```
+
+**示例 2：**
+
+```
+输入：s = ")()())"
+输出：4
+解释：最长有效括号子串是 "()()"
+```
+
+**示例 3：**
+
+```
+输入：s = ""
+输出：0
+```
+
+**提示：**
+
+*   0 <= s.length <= 3 * 10<sup>4</sup>
+*   `s[i]` 为 `'('` 或 `')'`
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {string} s
+ * @return {number}
+ */
+// 定义 dp[i] 表示以下标 i 字符结尾的最长有效括号的长度。
+/**
+)()())
+
+push: 一个参照物；左括号
+
+pop：左括号，一个参照物
+
+保持栈不能为空
+
+[-1]
+ */
+const longestValidParentheses = (s) => {
+    let n = s.length
+    let res = 0
+    let stack = [-1]
+    for (let i = 0; i < n; i++) {
+        let str = s[i]
+        if (str === '(') {
+            stack.push(i)
+        } else {
+            stack.pop()
+            if (stack.length) {
+                res = Math.max(res, i - stack[stack.length - 1])
+            } else {
+                stack.push(i)
+            }
+        }
+    }
+    return res
+};
+```
+
+# [33\. 搜索旋转排序数组](https://leetcode.cn/problems/search-in-rotated-sorted-array/)
+
+## Description
+
+Difficulty: **中等**  
+
+Related Topics: [数组](https://leetcode.cn/tag/array/), [二分查找](https://leetcode.cn/tag/binary-search/)
+
+
+整数数组 `nums` 按升序排列，数组中的值 **互不相同** 。
+
+在传递给函数之前，`nums` 在预先未知的某个下标 `k`（`0 <= k < nums.length`）上进行了 **旋转**，使数组变为 `[nums[k], nums[k+1], ..., nums[n-1], nums[0], nums[1], ..., nums[k-1]]`（下标 **从 0 开始** 计数）。例如， `[0,1,2,4,5,6,7]` 在下标 `3` 处经旋转后可能变为 `[4,5,6,7,0,1,2]` 。
+
+给你 **旋转后** 的数组 `nums` 和一个整数 `target` ，如果 `nums` 中存在这个目标值 `target` ，则返回它的下标，否则返回 `-1` 。
+
+你必须设计一个时间复杂度为 `O(log n)` 的算法解决此问题。
+
+**示例 1：**
+
+```
+输入：nums = [4,5,6,7,0,1,2], target = 0
+输出：4
+```
+
+**示例 2：**
+
+```
+输入：nums = [4,5,6,7,0,1,2], target = 3
+输出：-1
+```
+
+**示例 3：**
+
+```
+输入：nums = [1], target = 0
+输出：-1
+```
+
+**提示：**
+
+*   `1 <= nums.length <= 5000`
+*   -10<sup>4</sup> <= nums[i] <= 10<sup>4</sup>
+*   `nums` 中的每个值都 **独一无二**
+*   题目数据保证 `nums` 在预先未知的某个下标上进行了旋转
+*   -10<sup>4</sup> <= target <= 10<sup>4</sup>
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} nums
+ * @param {number} target
+ * @return {number}
+ * 二分搜索
+ * 关键字：排序，搜索
+ */
+var search = function(nums, target) {
+    let [left, right] = [0, nums.length - 1]
+
+    while (left <= right) {
+        const mid = (left + right) >>> 1
+        if (nums[mid] === target) return mid
+
+        if (nums[mid] > nums[right]) {
+            if (nums[left] <= target && nums[mid] > target) right = mid - 1
+            else left = mid + 1
+        } else {
+            if (nums[mid] < target && nums[right] >= target) left = mid + 1
+            else right = right - 1
+        }
+    }
+    return -1
+}
+```
+
+
 
 
 
