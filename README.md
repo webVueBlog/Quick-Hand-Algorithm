@@ -3107,7 +3107,250 @@ const dfs = function(word, board, y, x, i) {
 }
 ```
 
+# [84\. 柱状图中最大的矩形](https://leetcode.cn/problems/largest-rectangle-in-histogram/)
 
+## Description
+
+Difficulty: **困难**  
+
+Related Topics: [栈](https://leetcode.cn/tag/stack/), [数组](https://leetcode.cn/tag/array/), [单调栈](https://leetcode.cn/tag/monotonic-stack/)
+
+
+给定 _n_ 个非负整数，用来表示柱状图中各个柱子的高度。每个柱子彼此相邻，且宽度为 1 。
+
+求在该柱状图中，能够勾勒出来的矩形的最大面积。
+
+**示例 1:**
+
+![](https://assets.leetcode.com/uploads/2021/01/04/histogram.jpg)
+
+```
+输入：heights = [2,1,5,6,2,3]
+输出：10
+解释：最大的矩形为图中红色区域，面积为 10
+```
+
+**示例 2：**
+
+![](https://assets.leetcode.com/uploads/2021/01/04/histogram-1.jpg)
+
+```
+输入： heights = [2,4]
+输出： 4
+```
+
+**提示：**
+
+*   1 <= heights.length <=10<sup>5</sup>
+*   0 <= heights[i] <= 10<sup>4</sup>
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {number[]} heights
+ * @return {number}
+ */
+// 分治法
+// 从高度值最小的高度的最大面积 (end-start+1) * height[min]，将该面积与高度最小的柱子左边和右边形成的最大面积来比较。
+// 分治的最后是每一个矩形的面积。
+
+const largestRectangleArea = (heights) => {
+    let maxArea = 0
+    const stack = [] // 单调递增栈 注意栈存的是下标
+    heights = [0, ...heights, 0] // 在heights数组前后增加哨兵 用来清零单调递增栈里的元素
+    for (let i = 0; i < heights.length; i++) {
+        // 当前元素对应的高度小于栈顶元素对应的高度时
+        while (heights[i] < heights[stack[stack.length - 1]]) {
+            const stackTopIndex = stack.pop() // 出栈
+            maxArea = Math.max( // 计算面积 并更新最大面积
+                maxArea,
+                heights[stackTopIndex] * (i - stack[stack.length - 1] - 1) // 高乘宽
+            }
+        }
+        stack.push(i) // 当前下标加入栈
+    }
+    return maxArea
+}
+```
+
+# [85\. 最大矩形](https://leetcode.cn/problems/maximal-rectangle/)
+
+## Description
+
+Difficulty: **困难**  
+
+Related Topics: [栈](https://leetcode.cn/tag/stack/), [数组](https://leetcode.cn/tag/array/), [动态规划](https://leetcode.cn/tag/dynamic-programming/), [矩阵](https://leetcode.cn/tag/matrix/), [单调栈](https://leetcode.cn/tag/monotonic-stack/)
+
+
+给定一个仅包含 `0` 和 `1` 、大小为 `rows x cols` 的二维二进制矩阵，找出只包含 `1` 的最大矩形，并返回其面积。
+
+**示例 1：**
+
+![](https://assets.leetcode.com/uploads/2020/09/14/maximal.jpg)
+
+```
+输入：matrix = [["1","0","1","0","0"],["1","0","1","1","1"],["1","1","1","1","1"],["1","0","0","1","0"]]
+输出：6
+解释：最大矩形如上图所示。
+```
+
+**示例 2：**
+
+```
+输入：matrix = []
+输出：0
+```
+
+**示例 3：**
+
+```
+输入：matrix = [["0"]]
+输出：0
+```
+
+**示例 4：**
+
+```
+输入：matrix = [["1"]]
+输出：1
+```
+
+**示例 5：**
+
+```
+输入：matrix = [["0","0"]]
+输出：0
+```
+
+**提示：**
+
+*   `rows == matrix.length`
+*   `cols == matrix[0].length`
+*   `1 <= row, cols <= 200`
+*   `matrix[i][j]` 为 `'0'` 或 `'1'`
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * @param {character[][]} matrix
+ * @return {number}
+ */
+var maximalRectangle = function(matrix) {
+    if (matrix.length === 0) return 0
+
+    let res = 0
+    let heights = new Array(matrix[0].length).fill(0) // 初始化heights数组
+    for (let row = 0; row < matrix.length; row++) {
+        for (let col = 0; col < matrix[0].length; col++) {
+            if (matrix[row][col] === '1') heights[col] += 1
+            else heights[col] = 0
+        } // 求出每一层的 heights[] 然后传给 largestRectangleArea 函数
+        res = Math.max(res, largestRectangleArea(heights)) // 更新一下最大矩形面积
+    }
+    return res
+};
+
+const largestRectangleArea = (heights) => {
+    let maxArea = 0
+    const stack = [] // 单调递增栈 注意栈存的是下标
+    heights = [0, ...heights, 0] // 在 heights 数组前后增加两个哨兵 用来清零单调递增栈里的元素
+    for (let i = 0; i < heights.length; i++) {
+        // 当前元素对应的高度小于栈顶元素对应的高度时
+        while (heights[i] < heights[stack[stack.length - 1]]) {
+            const stackTopIndex = stack.pop() // 出栈
+            maxArea = Math.max(
+                maxArea,
+                heights[stackTopIndex] * (i - stack[stack.length - 1] - 1) // 高乘宽
+            )
+        }
+        stack.push(i) // 当前下标加入栈
+    }
+    return maxArea
+}
+
+```
+
+# [94\. 二叉树的中序遍历](https://leetcode.cn/problems/binary-tree-inorder-traversal/)
+
+## Description
+
+Difficulty: **简单**  
+
+Related Topics: [栈](https://leetcode.cn/tag/stack/), [树](https://leetcode.cn/tag/tree/), [深度优先搜索](https://leetcode.cn/tag/depth-first-search/), [二叉树](https://leetcode.cn/tag/binary-tree/)
+
+
+给定一个二叉树的根节点 `root` ，返回 _它的 **中序** 遍历_ 。
+
+**示例 1：**
+
+![](https://assets.leetcode.com/uploads/2020/09/15/inorder_1.jpg)
+
+```
+输入：root = [1,null,2,3]
+输出：[1,3,2]
+```
+
+**示例 2：**
+
+```
+输入：root = []
+输出：[]
+```
+
+**示例 3：**
+
+```
+输入：root = [1]
+输出：[1]
+```
+
+**提示：**
+
+*   树中节点数目在范围 `[0, 100]` 内
+*   `-100 <= Node.val <= 100`
+
+**进阶:** 递归算法很简单，你可以通过迭代算法完成吗？
+
+
+## Solution
+
+Language: **JavaScript**
+
+```javascript
+/**
+ * Definition for a binary tree node.
+ * function TreeNode(val, left, right) {
+ *     this.val = (val===undefined ? 0 : val)
+ *     this.left = (left===undefined ? null : left)
+ *     this.right = (right===undefined ? null : right)
+ * }
+ */
+/**
+ * @param {TreeNode} root
+ * @return {number[]}
+ */
+// 栈
+var inorderTraversal = function(root) {
+    const res = []
+    let stack = []
+    while (root || stack.length) {
+        while (root) {
+            stack.push(root)
+            root = root.left
+        }
+        root 
+    }
+}
+
+```
 
 
 
